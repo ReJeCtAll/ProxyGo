@@ -16,6 +16,10 @@ let defaultTitle = "当前网页未使用代理";
 // Icon update debouncing
 let iconUpdateTimeouts = new Map();
 
+// IP地址缓存 - 新增功能
+let ipAddressCache = new Map();
+const IP_CACHE_TTL = 300000; // 5分钟缓存时间
+
 // 网络透视板数据存储
 let networkStats = {
   domainCounts: {},
@@ -39,6 +43,84 @@ chrome.alarms.onAlarm.addListener((alarm) => {
     // chrome.storage.local.set({ lastHeartbeat: Date.now() });
   }
 });
+
+// WebRequest监听器 - 获取真实IP地址
+chrome.webRequest.onResponseStarted.addListener(
+  (details) => {
+    if (details.ip && details.url && details.frameId === 0) {
+      try {
+        const url = new URL(details.url);
+        const domain = url.hostname;
+        const timestamp = Date.now();
+        
+        // 缓存IP地址，包含时间戳用于TTL
+        ipAddressCache.set(domain, {
+          ip: details.ip,
+          timestamp: timestamp,
+          fromCache: details.fromCache || false
+        });
+        
+        console.log(`🌐 获取到真实IP: ${domain} -> ${details.ip} (来自缓存: ${details.fromCache || false})`);
+        
+        // 清理过期的缓存条目
+        cleanupIPCache();
+        
+      } catch (error) {
+        console.log(`解析URL失败: ${details.url}, 错误: ${error.message}`);
+      }
+    }
+  },
+  {urls: ["<all_urls>"]},
+  ["responseHeaders"]
+);
+
+// 清理过期的IP缓存条目
+function cleanupIPCache() {
+  const now = Date.now();
+  for (const [domain, data] of ipAddressCache.entries()) {
+    if (now - data.timestamp > IP_CACHE_TTL) {
+      ipAddressCache.delete(domain);
+    }
+  }
+  
+  // 限制缓存大小，最多保留500个条目
+  if (ipAddressCache.size > 500) {
+    const entries = Array.from(ipAddressCache.entries());
+    entries.sort((a, b) => a[1].timestamp - b[1].timestamp);
+    const toDelete = entries.slice(0, ipAddressCache.size - 400);
+    toDelete.forEach(([domain]) => ipAddressCache.delete(domain));
+  }
+}
+
+// 获取域名的IP地址
+function getIPForDomain(domain) {
+  const cached = ipAddressCache.get(domain);
+  if (cached && (Date.now() - cached.timestamp < IP_CACHE_TTL)) {
+    return cached.ip;
+  }
+  
+  // 尝试从子域名或主域名获取IP
+  for (const [cachedDomain, data] of ipAddressCache.entries()) {
+    if (Date.now() - data.timestamp < IP_CACHE_TTL) {
+      // 检查是否为同一主域名的不同子域名
+      if (domain.endsWith(cachedDomain) || cachedDomain.endsWith(domain)) {
+        const domainParts = domain.split('.');
+        const cachedParts = cachedDomain.split('.');
+        if (domainParts.length >= 2 && cachedParts.length >= 2) {
+          const domainRoot = domainParts.slice(-2).join('.');
+          const cachedRoot = cachedParts.slice(-2).join('.');
+          if (domainRoot === cachedRoot) {
+            console.log(`🔍 使用相关域名IP: ${domain} -> ${data.ip} (来源: ${cachedDomain})`);
+            return data.ip;
+          }
+        }
+      }
+    }
+  }
+  
+  return "N/A";
+}
+
 // Initialize extension
 function init() {
   console.log('ProxyGo扩展初始化开始...');
@@ -236,8 +318,8 @@ function collectNetworkData(url, useProxy) {
     networkStats.domainCounts[domain].count++;
     networkStats.domainCounts[domain].lastAccess = timestamp;
     
-    // 获取IP地址（模拟，实际中可以通过DNS查询获取）
-    let ip = "N/A";
+    // 获取IP地址 - 使用真实的webRequest缓存数据
+    let ip = getIPForDomain(domain);
     
     // 添加最新请求记录
     const requestRecord = {
