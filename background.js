@@ -161,13 +161,32 @@ function createIcons() {
   function createSingleIcon(isProxy) {
     const canvas = new OffscreenCanvas(32, 32);
     const ctx = canvas.getContext("2d");
-    ctx.fillStyle = isProxy ? "#4f46e5" : "#9ca3af";
-    ctx.fillRect(0, 0, 32, 32);
+    
+    // 创建渐变背景
+    const gradient = ctx.createLinearGradient(0, 0, 32, 32);
+    if (isProxy) {
+      gradient.addColorStop(0, "#1e3c72");  // 深蓝色（代理开启）
+      gradient.addColorStop(1, "#2a5298");
+    } else {
+      gradient.addColorStop(0, "#6b7280");  // 灰色（代理关闭）
+      gradient.addColorStop(1, "#9ca3af");
+    }
+    
+    // 绘制圆形背景
+    ctx.fillStyle = gradient;
+    ctx.beginPath();
+    ctx.arc(16, 16, 16, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // 设置文字样式
     ctx.fillStyle = "white";
-    ctx.font = "bold 18px Arial";
+    ctx.font = "bold 14px Arial";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText("F", 16, 16);
+    
+    // 绘制"GO"文字
+    ctx.fillText("GO", 16, 16);
+    
     return ctx.getImageData(0, 0, 32, 32);
   }
   proxyIcon = { "32": createSingleIcon(true) };

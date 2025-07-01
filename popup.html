@@ -5,47 +5,123 @@
   <title>ProxyGo</title>
   <link rel="stylesheet" href="common.css">
   <style>
+    /* Microsoft Wallet Style - Light Theme Variables */
+    :root {
+      --ms-bg-primary: #ffffff;
+      --ms-bg-secondary: #f8f9fa;
+      --ms-bg-card: #ffffff;
+      --ms-text-primary: #1f2937;
+      --ms-text-secondary: #6b7280;
+      --ms-text-muted: #9ca3af;
+      --ms-accent: #0078d4;
+      --ms-accent-hover: #106ebe;
+      --ms-accent-light: rgba(0, 120, 212, 0.1);
+      --ms-success: #00cc88;
+      --ms-border: #e5e7eb;
+      --ms-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      --ms-shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.15);
+    }
+
     /* Popup specific styles */
     body {
       width: 360px;
       padding: 0;
       margin: 0;
       min-height: auto;
+      background: linear-gradient(135deg, var(--ms-bg-primary) 0%, var(--ms-bg-secondary) 100%);
+      color: var(--ms-text-primary);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     }
 
     .popup-container {
       padding: 20px;
+      background: var(--ms-bg-primary);
     }
 
     .popup-header {
       display: flex;
       align-items: center;
+      justify-content: space-between;
       margin-bottom: 24px;
-      padding: 16px 0;
-      border-bottom: 1px solid var(--border-light);
+      padding: 20px;
+      background: var(--ms-bg-card);
+      border-radius: 12px;
+      box-shadow: var(--ms-shadow);
+      border: 1px solid var(--ms-border);
     }
 
     .popup-header .logo {
-      margin-right: 12px;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--ms-accent) 0%, var(--ms-accent-hover) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--ms-shadow);
+    }
+
+    .popup-header .header-info {
+      flex: 1;
+      margin-left: 12px;
     }
 
     .popup-header .title {
-      font-size: 20px;
-      font-weight: 700;
-      margin: 0;
-      background: linear-gradient(135deg, var(--text) 0%, var(--text-secondary) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0 0 4px 0;
+      color: var(--ms-text-primary);
+    }
+
+    .popup-header .status-badge {
+      font-size: 12px;
+      color: var(--ms-success);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .popup-header .status-badge::before {
+      content: "✓";
+      background: var(--ms-success);
+      color: white;
+      border-radius: 50%;
+      width: 16px;
+      height: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: bold;
+    }
+
+    .popup-header .settings-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      background: var(--ms-bg-secondary);
+      border: 1px solid var(--ms-border);
+      color: var(--ms-text-secondary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .popup-header .settings-btn:hover {
+      background: var(--ms-accent-light);
+      color: var(--ms-accent);
+      border-color: var(--ms-accent);
     }
 
     .popup-card {
-      background: linear-gradient(135deg, var(--card-bg) 0%, #ffffff 100%);
-      border-radius: var(--radius-lg);
+      background: var(--ms-bg-card);
+      border-radius: 12px;
       padding: 20px;
-      box-shadow: var(--shadow-lg);
+      box-shadow: var(--ms-shadow);
       margin-bottom: 16px;
-      border: 1px solid var(--border-light);
+      border: 1px solid var(--ms-border);
       position: relative;
       overflow: hidden;
     }
@@ -56,42 +132,63 @@
       top: 0;
       left: 0;
       right: 0;
-      height: 4px;
-      background: linear-gradient(90deg, var(--primary) 0%, var(--primary-hover) 100%);
+      height: 3px;
+      background: linear-gradient(90deg, var(--ms-accent) 0%, var(--ms-accent-hover) 100%);
     }
 
     .proxy-status {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 16px;
-      background: linear-gradient(135deg, var(--success-light) 0%, #ffffff 100%);
-      border-radius: var(--radius-md);
-      border: 1px solid var(--border-light);
+      padding: 0;
+      background: transparent;
+      border-radius: 0;
+      border: none;
       margin-bottom: 0;
     }
 
     .status-info {
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 8px;
+      flex: 1;
+    }
+
+    .status-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .status-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      background: var(--ms-accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 12px;
+      font-weight: bold;
     }
 
     .status-label {
       font-weight: 600;
-      font-size: 15px;
-      color: var(--text);
+      font-size: 16px;
+      color: var(--ms-text-primary);
     }
 
     .proxy-url {
-      font-size: 13px;
-      color: var(--text-secondary);
+      font-size: 12px;
+      color: var(--ms-text-muted);
       font-family: ui-monospace, SFMono-Regular, 'SF Mono', Consolas, monospace;
-      background-color: rgba(255, 255, 255, 0.8);
-      padding: 4px 8px;
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--border-light);
+      background-color: var(--ms-bg-secondary);
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--ms-border);
       word-break: break-all;
+      margin-top: 4px;
     }
 
     .toggle-switch {
@@ -99,6 +196,7 @@
       display: inline-block;
       width: 52px;
       height: 28px;
+      margin-left: 16px;
     }
 
     .toggle-switch input {
@@ -114,45 +212,48 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background: linear-gradient(135deg, #d1d5db, #e5e7eb);
+      background: var(--ms-bg-secondary);
       transition: all 0.3s ease;
       border-radius: 28px;
-      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+      border: 2px solid var(--ms-border);
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
     }
 
     .slider:before {
       position: absolute;
       content: "";
-      height: 22px;
-      width: 22px;
-      left: 3px;
-      bottom: 3px;
-      background: linear-gradient(135deg, #ffffff, #f8fafc);
+      height: 20px;
+      width: 20px;
+      left: 2px;
+      bottom: 2px;
+      background: white;
       transition: all 0.3s ease;
       border-radius: 50%;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     }
 
     input:checked + .slider {
-      background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+      background: var(--ms-success);
+      border-color: var(--ms-success);
     }
 
     input:checked + .slider:before {
+      background: white;
       transform: translateX(24px);
     }
 
     .slider:hover {
-      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1), 0 0 0 4px rgba(99, 102, 241, 0.1);
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 0 3px var(--ms-accent-light);
     }
 
     .mode-selector {
       display: flex;
-      background: linear-gradient(135deg, var(--border-light) 0%, #ffffff 100%);
-      border-radius: var(--radius-md);
-      padding: 4px;
+      background: var(--ms-bg-card);
+      border-radius: 8px;
+      padding: 6px;
       margin-bottom: 20px;
-      box-shadow: var(--shadow-sm);
-      border: 1px solid var(--border-light);
+      box-shadow: var(--ms-shadow);
+      border: 1px solid var(--ms-border);
     }
 
     .mode-option {
@@ -162,22 +263,22 @@
       font-size: 14px;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.3s ease;
-      border-radius: var(--radius-sm);
-      color: var(--text-secondary);
+      transition: all 0.2s ease;
+      border-radius: 6px;
+      color: var(--ms-text-secondary);
       position: relative;
     }
 
     .mode-option:hover {
-      color: var(--text);
-      background-color: rgba(99, 102, 241, 0.05);
+      color: var(--ms-text-primary);
+      background-color: var(--ms-accent-light);
     }
 
     .mode-option.active {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+      background: var(--ms-accent);
       color: white;
-      box-shadow: var(--shadow-sm);
-      transform: translateY(-1px);
+      box-shadow: 0 2px 4px rgba(0, 120, 212, 0.4);
+      transform: none;
     }
 
     .popup-button {
@@ -185,12 +286,12 @@
       width: 100%;
       padding: 14px 20px;
       text-align: center;
-      border-radius: var(--radius-md);
+      border-radius: 8px;
       border: none;
       cursor: pointer;
       font-weight: 600;
       font-size: 14px;
-      transition: all 0.3s ease;
+      transition: all 0.2s ease;
       position: relative;
       overflow: hidden;
       margin-bottom: 12px;
@@ -203,8 +304,8 @@
       left: -100%;
       width: 100%;
       height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-      transition: left 0.5s;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      transition: left 0.4s;
     }
 
     .popup-button:hover:before {
@@ -212,14 +313,16 @@
     }
 
     .popup-button.primary {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+      background: var(--ms-accent);
       color: white;
-      box-shadow: var(--shadow-md);
+      box-shadow: var(--ms-shadow);
+      border: 1px solid var(--ms-accent);
     }
 
     .popup-button.primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 16px -4px rgba(99, 102, 241, 0.3);
+      background: var(--ms-accent-hover);
+      transform: translateY(-1px);
+      box-shadow: var(--ms-shadow-lg);
     }
 
     .popup-button.primary:active {
@@ -227,29 +330,29 @@
     }
 
     .popup-button.secondary {
-      background: linear-gradient(135deg, #ffffff 0%, var(--bg) 100%);
-      color: var(--text);
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow-sm);
+      background: var(--ms-bg-card);
+      color: var(--ms-text-primary);
+      border: 1px solid var(--ms-border);
+      box-shadow: var(--ms-shadow);
     }
 
     .popup-button.secondary:hover {
-      background: linear-gradient(135deg, var(--bg) 0%, #f1f5f9 100%);
-      border-color: var(--primary);
-      color: var(--primary);
+      background: var(--ms-bg-secondary);
+      border-color: var(--ms-accent);
+      color: var(--ms-accent);
       transform: translateY(-1px);
     }
 
     .help-text {
       font-size: 13px;
-      color: var(--text-muted);
+      color: var(--ms-text-muted);
       margin-top: 8px;
-      margin-bottom: 12px;
+      margin-bottom: 16px;
       line-height: 1.4;
-      background-color: var(--primary-light);
-      padding: 12px;
-      border-radius: var(--radius-md);
-      border-left: 3px solid var(--primary);
+      background-color: var(--ms-bg-secondary);
+      padding: 14px;
+      border-radius: 8px;
+      border-left: 3px solid var(--ms-accent);
     }
 
     .hidden {
@@ -260,21 +363,41 @@
 <body>
   <div class="popup-container">
     <div class="popup-header">
-      <div class="logo logo-svg popup-logo">
-        <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+      <div class="logo">
+        <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style="width: 24px; height: 24px;">
+          <defs>
+            <linearGradient id="popupGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:#1e3c72;stop-opacity:1" />
+              <stop offset="100%" style="stop-color:#2a5298;stop-opacity:1" />
+            </linearGradient>
+          </defs>
           <g transform="translate(0,32) scale(0.1,-0.1)">
-            <path d="M102 303 c-47 -23 -78 -59 -90 -103 -25 -99 45 -191 146 -193 115 -2 189 118 138 224 -32 67 -129 103 -194 72z m66 -105 c3 -15 -4 -18 -37 -18 -34 0 -41 -3 -41 -20 0 -11 5 -20 10 -20 6 0 10 7 10 15 0 10 10 15 31 15 28 0 30 -2 27 -32 -3 -30 -6 -33 -41 -36 -52 -4 -87 19 -87 58 0 39 33 62 85 58 29 -2 41 -8 43 -20z m93 -18 c21 -12 25 -50 7 -68 -17 -17 -54 -15 -72 4 -21 20 -20 30 4 54 23 23 33 24 61 10z"/>
-            <path d="M220 140 c0 -5 5 -10 10 -10 6 0 10 5 10 10 0 6 -4 10 -10 10 -5 0 -10 -4 -10 -10z"/>
+            <circle cx="160" cy="160" r="160" fill="url(#popupGradient)" stroke="none"/>
+            <!-- 字母 G -->
+            <path d="M80 220 c-30 -15 -40 -40 -40 -60 0 -40 30 -70 70 -70 25 0 40 10 50 30 l5 15 -20 0 c-15 0 -20 -5 -20 -15 0 -8 -7 -15 -15 -15 -20 0 -35 15 -35 35 0 20 15 35 35 35 8 0 15 -7 15 -15 0 -10 5 -15 20 -15 l20 0 0 20 c0 25 -25 50 -50 50 -10 0 -25 -7 -35 -15z" fill="white"/>
+            <!-- 字母 O -->
+            <path d="M200 220 c-30 -15 -40 -40 -40 -60 0 -20 10 -45 40 -60 20 -10 40 -10 60 0 30 15 40 40 40 60 0 20 -10 45 -40 60 -20 10 -40 10 -60 0z m40 -40 c15 0 25 -10 25 -25 0 -15 -10 -25 -25 -25 -15 0 -25 10 -25 25 0 15 10 25 25 25z" fill="white"/>
           </g>
         </svg>
       </div>
-      <h1 class="title">ProxyGo</h1>
+      <div class="header-info">
+        <h1 class="title">ProxyGo</h1>
+        <div class="status-badge">功能已就绪</div>
+      </div>
+      <div class="settings-btn" title="设置">
+        <svg viewBox="0 0 24 24" style="width: 16px; height: 16px; fill: currentColor;">
+          <path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.82,11.69,4.82,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/>
+        </svg>
+      </div>
     </div>
 
     <div class="popup-card">
       <div class="proxy-status">
         <div class="status-info">
-          <span class="status-label">启用代理</span>
+          <div class="status-header">
+            <div class="status-icon">🌐</div>
+            <span class="status-label">代理服务</span>
+          </div>
           <div class="proxy-url" id="proxyUrlDisplay">http://localhost:7890</div>
         </div>
         <label class="toggle-switch">
@@ -294,8 +417,7 @@
       <strong>黑名单模式</strong>：黑名单中的域名走代理，其他一律直连
     </div>
     
-    <button class="popup-button primary" id="openSettings">详细设置</button>
-    <button class="popup-button secondary hidden" id="showRules">查看当前规则</button>
+    <button class="popup-button primary" id="openSettings">网络透视板</button>
   </div>
 
   <script src="popup.js"></script>

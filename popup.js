@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const proxyUrlDisplay = document.getElementById("proxyUrlDisplay");
   const modeOptions = document.querySelectorAll(".mode-option");
   const openSettingsButton = document.getElementById("openSettings");
-  const showRulesButton = document.getElementById("showRules");
+  const settingsBtn = document.querySelector(".settings-btn");
 
   // Initialize state
   let proxyEnabled = true;
@@ -81,12 +81,6 @@ document.addEventListener("DOMContentLoaded", () => {
       console.log(`Loaded blacklist URL rules: ${blacklistUrlRulesParsed.length} rules`);
     }
     
-    // Make Show Rules button visible if we have rules
-    if ((currentMode === "whitelist" && (whitelistRules.length > 0 || whitelistUrlRulesParsed.length > 0)) || 
-        (currentMode === "blacklist" && (blacklistRules.length > 0 || blacklistUrlRulesParsed.length > 0))) {
-      showRulesButton.classList.remove("hidden");
-    }
-    
     // Update proxy state
     updateProxyState();
   });
@@ -113,49 +107,19 @@ document.addEventListener("DOMContentLoaded", () => {
         chrome.storage.local.set({ mode: currentMode }, () => {
           console.log(`Mode changed to: ${currentMode}`);
           updateProxyState();
-          
-          // Update Show Rules button visibility based on new mode
-          if ((currentMode === "whitelist" && (whitelistRules.length > 0 || whitelistUrlRulesParsed.length > 0)) || 
-              (currentMode === "blacklist" && (blacklistRules.length > 0 || blacklistUrlRulesParsed.length > 0))) {
-            showRulesButton.classList.remove("hidden");
-          } else {
-            showRulesButton.classList.add("hidden");
-          }
         });
       }
     });
   });
 
-  // Open detailed settings
+  // Open network dashboard
   openSettingsButton.addEventListener("click", () => {
-    chrome.tabs.create({ url: "settings.html" });
+    chrome.tabs.create({ url: "network-dashboard.html" });
   });
 
-  // Show current rules
-  showRulesButton.addEventListener("click", () => {
-    // Get combined rules based on current mode
-    const manualRules = currentMode === "whitelist" ? whitelistRules : blacklistRules;
-    const urlRules = currentMode === "whitelist" ? whitelistUrlRulesParsed : blacklistUrlRulesParsed;
-    const combinedRules = [...manualRules, ...urlRules];
-    
-    // Remove duplicates
-    const uniqueRules = [...new Set(combinedRules)];
-    
-    let message = `当前使用${currentMode === "whitelist" ? "白名单" : "黑名单"}模式，共${uniqueRules.length}条有效规则。`;
-    
-    if (manualRules.length > 0) {
-      message += `\n\n手动编辑规则（${manualRules.length}条）：\n` + manualRules.join("\n");
-    }
-    
-    if (urlRules.length > 0) {
-      message += `\n\nURL加载规则（${urlRules.length}条）：\n` + urlRules.join("\n");
-    }
-    
-    if (uniqueRules.length === 0) {
-      message += "\n\n暂无有效规则，请在详细设置中添加。";
-    }
-    
-    alert(message);
+  // Settings gear button click
+  settingsBtn.addEventListener("click", () => {
+    chrome.tabs.create({ url: "settings.html" });
   });
 
   // Update mode UI
