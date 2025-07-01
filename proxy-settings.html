@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>代理设置 - ProxyGo</title>
+  <link rel="stylesheet" href="common.css">
+  <style>
+    :root {
+      --primary: #6366f1;
+      --primary-hover: #5b5bd6;
+      --primary-light: #f0f1ff;
+      --success: #10b981;
+      --success-light: #ecfdf5;
+      --danger: #ef4444;
+      --danger-light: #fee2e2;
+      --warning: #f59e0b;
+      --warning-light: #fef3c7;
+      --info: #3b82f6;
+      --info-light: #dbeafe;
+      --bg: #fefefe;
+      --card-bg: #ffffff;
+      --text: #1f2937;
+      --text-secondary: #6b7280;
+      --text-muted: #9ca3af;
+      --border: #e5e7eb;
+      --border-light: #f3f4f6;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --radius-sm: 6px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #fefefe 0%, #f8fafc 100%);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 24px;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 32px;
+      padding: 24px;
+      background: linear-gradient(135deg, var(--card-bg) 0%, #ffffff 100%);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--border-light);
+    }
+
+    .logo {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+      border-radius: var(--radius-lg);
+      margin-right: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 22px;
+      box-shadow: var(--shadow-md);
+    }
+
+    .title {
+      font-size: 28px;
+      font-weight: 700;
+      margin: 0;
+      background: linear-gradient(135deg, var(--text) 0%, var(--text-secondary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      margin-top: 4px;
+      font-size: 16px;
+      font-weight: 500;
+    }
+
+    .card {
+      background: linear-gradient(135deg, var(--card-bg) 0%, #ffffff 100%);
+      border-radius: var(--radius-xl);
+      padding: 32px;
+      box-shadow: var(--shadow-lg);
+      margin-bottom: 32px;
+      border: 1px solid var(--border-light);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary) 0%, var(--primary-hover) 100%);
+    }
+
+    .card-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin: 0 0 24px 0;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-title:before {
+      content: '';
+      width: 4px;
+      height: 20px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+      border-radius: 2px;
+    }
+
+    .form-group {
+      margin-bottom: 24px;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 12px;
+      font-weight: 600;
+      font-size: 15px;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .help-text {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 8px;
+      line-height: 1.5;
+      background-color: var(--primary-light);
+      padding: 12px 16px;
+      border-radius: var(--radius-md);
+      border-left: 3px solid var(--primary);
+    }
+
+    .help-text code {
+      background-color: rgba(255, 255, 255, 0.8);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: ui-monospace, SFMono-Regular, 'SF Mono', Consolas, monospace;
+      font-size: 12px;
+      color: var(--primary);
+      border: 1px solid var(--border-light);
+    }
+
+    .input-group {
+      display: flex;
+      align-items: stretch;
+      gap: 12px;
+    }
+
+    .input-group input {
+      flex: 1;
+    }
+
+    .input-group .button {
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    input[type="text"], textarea {
+      width: 100%;
+      padding: 14px 16px;
+      border: 2px solid var(--border-light);
+      border-radius: var(--radius-md);
+      font-family: inherit;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      background: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%);
+      color: var(--text);
+    }
+
+    input[type="text"]:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+      background: #ffffff;
+      transform: translateY(-1px);
+    }
+
+    input[type="text"]:hover, textarea:hover {
+      border-color: var(--border);
+    }
+
+    .switch-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 26px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: var(--border);
+      transition: .4s;
+      border-radius: 34px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+      box-shadow: var(--shadow-sm);
+    }
+
+    input:checked + .slider {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+    }
+
+    input:focus + .slider {
+      box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(24px);
+    }
+
+    .switch-label {
+      font-weight: 600;
+      font-size: 15px;
+      color: var(--text);
+    }
+
+    .actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 2px solid var(--border-light);
+      gap: 16px;
+    }
+
+    .button {
+      display: inline-block;
+      padding: 12px 20px;
+      text-align: center;
+      border-radius: var(--radius-md);
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .button:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .button:hover:before {
+      left: 100%;
+    }
+
+    .primary-button {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+      color: white;
+      box-shadow: var(--shadow-md);
+    }
+
+    .primary-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px -4px rgba(99, 102, 241, 0.3);
+    }
+
+    .primary-button:active {
+      transform: translateY(0);
+    }
+
+    .secondary-button {
+      background: linear-gradient(135deg, #ffffff 0%, var(--bg) 100%);
+      color: var(--text);
+      border: 2px solid var(--border-light);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .secondary-button:hover {
+      background: linear-gradient(135deg, var(--bg) 0%, #f1f5f9 100%);
+      border-color: var(--primary);
+      color: var(--primary);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .back-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 24px;
+      padding: 12px 20px;
+      background: linear-gradient(135deg, var(--text-secondary) 0%, var(--text) 100%);
+      color: white;
+      border-radius: var(--radius-md);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+
+    .back-button:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 48px;
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    .success-toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: linear-gradient(135deg, var(--success) 0%, #34d399 100%);
+      color: white;
+      padding: 16px 24px;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.5s ease;
+      z-index: 1000;
+    }
+
+    .success-toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .toast-icon {
+      font-size: 20px;
+    }
+
+    .toast-message {
+      font-weight: 600;
+    }
+
+    .form-row {
+      margin-bottom: 20px;
+    }
+    
+    .form-row label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    
+    .form-row input[type="text"],
+    .form-row input[type="number"] {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      font-size: 14px;
+    }
+    
+    .form-row input[type="text"]:focus,
+    .form-row input[type="number"]:focus {
+      border-color: var(--primary);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+    }
+    
+    .form-row .help-text {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 6px;
+      line-height: 1.4;
+      background-color: var(--border-light);
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      border-left: 3px solid var(--info);
+    }
+    
+    .radio-group {
+      margin-top: 10px;
+    }
+    
+    .radio-option {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      transition: all 0.2s;
+    }
+    
+    .radio-option:hover {
+      background-color: var(--border-light);
+    }
+    
+    .radio-option.selected {
+      border-color: var(--primary);
+      background-color: var(--primary-light);
+    }
+    
+    .radio-option input[type="radio"] {
+      margin-right: 10px;
+    }
+    
+    .radio-label {
+      flex: 1;
+    }
+    
+    .radio-title {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    
+    .radio-description {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+    
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: var(--radius-md);
+      background-color: var(--info-light);
+      border-left: 4px solid var(--info);
+    }
+    
+    .status-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background-color: var(--info);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 12px;
+      font-weight: bold;
+    }
+    
+    .status-text {
+      flex: 1;
+    }
+    
+    .status-title {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    
+    .status-description {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin: 0;
+    }
+    
+    .status-active .status-icon {
+      background-color: var(--success);
+    }
+    
+    .status-active {
+      background-color: var(--success-light);
+      border-left-color: var(--success);
+    }
+    
+    .status-inactive .status-icon {
+      background-color: var(--danger);
+    }
+    
+    .status-inactive {
+      background-color: var(--danger-light);
+      border-left-color: var(--danger);
+    }
+
+    /* Logo样式 */
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .logo {
+      width: 64px;
+      height: 64px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 32px;
+      box-shadow: var(--shadow-md);
+    }
+
+    .logo-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .logo-title {
+      font-size: 32px;
+      font-weight: 700;
+      margin: 0;
+      background: linear-gradient(135deg, var(--text) 0%, var(--text-secondary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .logo-subtitle {
+      font-size: 16px;
+      color: var(--text-muted);
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+          <div class="logo-container">
+        <div class="logo logo-svg page-logo">
+          <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+            <g transform="translate(0,32) scale(0.1,-0.1)">
+              <path d="M102 303 c-47 -23 -78 -59 -90 -103 -25 -99 45 -191 146 -193 115 -2 189 118 138 224 -32 67 -129 103 -194 72z m66 -105 c3 -15 -4 -18 -37 -18 -34 0 -41 -3 -41 -20 0 -11 5 -20 10 -20 6 0 10 7 10 15 0 10 10 15 31 15 28 0 30 -2 27 -32 -3 -30 -6 -33 -41 -36 -52 -4 -87 19 -87 58 0 39 33 62 85 58 29 -2 41 -8 43 -20z m93 -18 c21 -12 25 -50 7 -68 -17 -17 -54 -15 -72 4 -21 20 -20 30 4 54 23 23 33 24 61 10z"/>
+              <path d="M220 140 c0 -5 5 -10 10 -10 6 0 10 5 10 10 0 6 -4 10 -10 10 -5 0 -10 -4 -10 -10z"/>
+            </g>
+          </svg>
+        </div>
+        <div class="logo-text">
+        <h1 class="logo-title">ProxyGo</h1>
+        <p class="logo-subtitle">简单高效的代理管理工具</p>
+      </div>
+    </div>
+    
+    <header>
+      <h1>代理设置</h1>
+      <a href="settings.html" class="back-link">返回菜单</a>
+    </header>
+    
+    <main>
+      <div class="card">
+        <h2>代理服务器配置</h2>
+        <p>设置代理服务器的地址、端口和连接模式。</p>
+        
+        <form id="proxySettingsForm">
+          <div class="form-row">
+            <label for="proxyHost">代理服务器地址</label>
+            <input type="text" id="proxyHost" placeholder="例如: 127.0.0.1 或 proxy.example.com" />
+            <div class="help-text">
+              支持IP地址和域名，会自动添加 http:// 协议前缀
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <label for="proxyPort">代理服务器端口</label>
+            <input type="number" id="proxyPort" placeholder="例如: 7890" min="1" max="65535" />
+            <div class="help-text">
+              常用端口：7890 (clash)、1080 (socks)、8080 (http)、3128 (squid)
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <label>代理模式</label>
+            <div class="radio-group">
+              <div class="radio-option" data-mode="direct">
+                <input type="radio" name="proxyMode" id="modeDirect" value="direct" />
+                <div class="radio-label">
+                  <div class="radio-title">直接连接</div>
+                  <div class="radio-description">所有请求都直接连接，不使用代理服务器。</div>
+                </div>
+              </div>
+              
+              <div class="radio-option" data-mode="whitelist">
+                <input type="radio" name="proxyMode" id="modeWhitelist" value="whitelist" />
+                <div class="radio-label">
+                  <div class="radio-title">白名单模式</div>
+                  <div class="radio-description">只有匹配白名单规则的域名直接连接，其他域名使用代理。</div>
+                </div>
+              </div>
+              
+              <div class="radio-option" data-mode="blacklist">
+                <input type="radio" name="proxyMode" id="modeBlacklist" value="blacklist" />
+                <div class="radio-label">
+                  <div class="radio-title">黑名单模式</div>
+                  <div class="radio-description">只有匹配黑名单规则的域名使用代理，其他域名直接连接。</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="button-container">
+            <button type="submit" class="button primary-button">保存设置</button>
+            <button type="button" id="testProxyButton" class="button secondary-button">测试连接</button>
+          </div>
+        </form>
+        
+        <div id="proxyStatus" class="status-indicator hidden">
+          <div class="status-icon">i</div>
+          <div class="status-text">
+            <div class="status-title">代理状态</div>
+            <p class="status-description" id="statusMessage">正在检查代理状态...</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="card">
+        <h2>代理模式说明</h2>
+        
+        <h3>直接连接模式</h3>
+        <p>在此模式下，所有网络请求都会直接连接到目标服务器，不会使用代理服务器。无论您设置了什么白名单或黑名单规则，都不会生效。</p>
+        
+        <h3>白名单模式</h3>
+        <p>在此模式下，只有匹配白名单规则的域名会直接连接，所有其他域名都会通过代理服务器连接。这适用于大部分网站都需要使用代理，只有少数网站直接访问的情况。</p>
+        
+        <h3>黑名单模式</h3>
+        <p>在此模式下，只有匹配黑名单规则的域名会通过代理服务器连接，所有其他域名都会直接连接。这适用于大部分网站都可以直接访问，只有少数网站需要使用代理的情况。</p>
+      </div>
+    </main>
+    
+    <footer>
+      <p>ProxyGo - 简单高效的代理管理工具</p>
+    </footer>
+  </div>
+  
+  <div class="success-toast" id="successToast">
+    <span class="toast-icon">✓</span>
+    <span class="toast-message">设置已保存</span>
+  </div>
+
+  <script src="proxy-settings.js"></script>
+</body>
+</html> 

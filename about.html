@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ProxyGo - 关于</title>
+  <link rel="stylesheet" href="common.css">
+  <style>
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 40px 24px;
+    }
+
+    .hero-section {
+      text-align: center;
+      margin-bottom: 48px;
+      padding: 48px 24px;
+      background: linear-gradient(135deg, var(--card-bg) 0%, #ffffff 100%);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border-light);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-section:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary) 0%, var(--primary-hover) 100%);
+    }
+
+    .hero-logo {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+      border-radius: var(--radius-xl);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px auto;
+      color: white;
+      font-weight: 700;
+      font-size: 40px;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .hero-title {
+      font-size: 42px;
+      font-weight: 700;
+      margin: 0 0 16px 0;
+      background: linear-gradient(135deg, var(--text) 0%, var(--primary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-subtitle {
+      font-size: 18px;
+      color: var(--text-secondary);
+      margin: 0 0 24px 0;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .hero-badges {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 12px;
+      background: linear-gradient(135deg, var(--primary-light) 0%, #ffffff 100%);
+      color: var(--primary);
+      border-radius: var(--radius-md);
+      font-size: 12px;
+      font-weight: 600;
+      border: 1px solid var(--primary-light);
+    }
+
+    .version-info {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, var(--success-light) 0%, #ffffff 100%);
+      color: var(--success);
+      padding: 8px 16px;
+      border-radius: var(--radius-lg);
+      font-weight: 600;
+      font-size: 14px;
+      border: 1px solid var(--success);
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+      margin-bottom: 48px;
+    }
+
+    .feature-card {
+      background: linear-gradient(135deg, var(--card-bg) 0%, #ffffff 100%);
+      border-radius: var(--radius-xl);
+      padding: 32px;
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--border-light);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .feature-card:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+    }
+
+    .feature-card.engine:before {
+      background: linear-gradient(90deg, var(--primary) 0%, var(--primary-hover) 100%);
+    }
+
+    .feature-card.dashboard:before {
+      background: linear-gradient(90deg, var(--warning) 0%, #d97706 100%);
+    }
+
+    .feature-card.tools:before {
+      background: linear-gradient(90deg, var(--info) 0%, #2563eb 100%);
+    }
+
+    .feature-card.management:before {
+      background: linear-gradient(90deg, var(--success) 0%, #0ea271 100%);
+    }
+
+    .feature-card.ui:before {
+      background: linear-gradient(90deg, var(--danger) 0%, #dc2626 100%);
+    }
+
+    .feature-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      font-size: 28px;
+      color: white;
+      font-weight: bold;
+    }
+
+    .feature-card.engine .feature-icon {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+    }
+
+    .feature-card.dashboard .feature-icon {
+      background: linear-gradient(135deg, var(--warning) 0%, #d97706 100%);
+    }
+
+    .feature-card.tools .feature-icon {
+      background: linear-gradient(135deg, var(--info) 0%, #2563eb 100%);
+    }
+
+    .feature-card.management .feature-icon {
+      background: linear-gradient(135deg, var(--success) 0%, #0ea271 100%);
+    }
+
+    .feature-card.ui .feature-icon {
+      background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%);
+    }
+
+    .feature-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin: 0 0 12px 0;
+      color: var(--text);
+    }
+
+    .feature-description {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+      margin-bottom: 48px;
+    }
+
+    .info-card {
+      background: linear-gradient(135deg, var(--card-bg) 0%, #ffffff 100%);
+      border-radius: var(--radius-xl);
+      padding: 32px;
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--border-light);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .info-card:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary) 0%, var(--primary-hover) 100%);
+    }
+
+    .info-card h3 {
+      font-size: 20px;
+      font-weight: 700;
+      margin: 0 0 16px 0;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .info-card p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin: 0 0 12px 0;
+    }
+
+    .tech-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .tech-tag {
+      background: linear-gradient(135deg, var(--primary-light) 0%, #ffffff 100%);
+      color: var(--primary);
+      padding: 4px 12px;
+      border-radius: var(--radius-md);
+      font-size: 12px;
+      font-weight: 600;
+      border: 1px solid var(--primary-light);
+    }
+
+    .author-card {
+      background: linear-gradient(135deg, var(--info-light) 0%, #ffffff 100%);
+      border: 1px solid var(--info);
+    }
+
+    .author-card:before {
+      background: linear-gradient(90deg, var(--info) 0%, #2563eb 100%);
+    }
+
+    .links-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-top: 24px;
+    }
+
+    .link-button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 20px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+      color: white;
+      text-decoration: none;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .link-button:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .link-button.secondary {
+      background: linear-gradient(135deg, var(--text-secondary) 0%, var(--text) 100%);
+    }
+
+    .link-button.success {
+      background: linear-gradient(135deg, var(--success) 0%, #0ea271 100%);
+    }
+
+    .stats-row {
+      display: flex;
+      justify-content: space-around;
+      margin: 24px 0;
+      padding: 20px;
+      background: linear-gradient(135deg, var(--primary-light) 0%, #ffffff 100%);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--primary-light);
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-number {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 4px;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+
+    @media (max-width: 768px) {
+      .hero-title {
+        font-size: 32px;
+      }
+
+      .features-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .info-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-badges {
+        justify-content: center;
+      }
+
+      .stats-row {
+        flex-direction: column;
+        gap: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- 页面头部 -->
+    <header>
+      <a href="settings.html" class="back-link">← 返回设置</a>
+      <h1>关于 ProxyGo</h1>
+    </header>
+
+    <!-- 英雄区域 -->
+    <div class="hero-section">
+      <div class="hero-logo logo-svg">
+        <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+          <g transform="translate(0,32) scale(0.1,-0.1)">
+            <path d="M102 303 c-47 -23 -78 -59 -90 -103 -25 -99 45 -191 146 -193 115 -2 189 118 138 224 -32 67 -129 103 -194 72z m66 -105 c3 -15 -4 -18 -37 -18 -34 0 -41 -3 -41 -20 0 -11 5 -20 10 -20 6 0 10 7 10 15 0 10 10 15 31 15 28 0 30 -2 27 -32 -3 -30 -6 -33 -41 -36 -52 -4 -87 19 -87 58 0 39 33 62 85 58 29 -2 41 -8 43 -20z m93 -18 c21 -12 25 -50 7 -68 -17 -17 -54 -15 -72 4 -21 20 -20 30 4 54 23 23 33 24 61 10z"/>
+            <path d="M220 140 c0 -5 5 -10 10 -10 6 0 10 5 10 10 0 6 -4 10 -10 10 -5 0 -10 -4 -10 -10z"/>
+          </g>
+        </svg>
+      </div>
+      <h1 class="hero-title">ProxyGo</h1>
+      <p class="hero-subtitle">专业级Chrome代理管理工具 - 下一代智能代理管理扩展，不仅仅是代理切换，更是完整的网络管理解决方案</p>
+      
+      <div class="hero-badges">
+        <span class="badge">Manifest V3</span>
+        <span class="badge">智能规则引擎</span>
+        <span class="badge">实时监控</span>
+        <span class="badge">可视化分析</span>
+      </div>
+
+      <div class="version-info">
+        <span>📦</span>
+        <span>当前版本：v<span id="currentVersion">1.1</span></span>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-item">
+          <div class="stat-number" id="codeLines">13万+</div>
+          <div class="stat-label">代码行数</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">5</div>
+          <div class="stat-label">核心模块</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">46</div>
+          <div class="stat-label">项目文件</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 功能特性网格 -->
+    <div class="features-grid">
+      <div class="feature-card engine">
+        <div class="feature-icon">🎯</div>
+        <h3 class="feature-title">智能代理规则引擎</h3>
+        <p class="feature-description">支持白名单/黑名单双模式，灵活的规则语法包括精确匹配、通配符、子域名、IP地址段。多规则源支持手动编辑、远程URL、文件导入，规则修改立即生效。</p>
+      </div>
+
+      <div class="feature-card dashboard">
+        <div class="feature-icon">📊</div>
+        <h3 class="feature-title">实时网络透视板</h3>
+        <p class="feature-description">TOP10域名访问排行榜，代理状态可视化展示，最近50条请求详细记录。提供域名访问频次统计、代理/直连流量比例分析、请求时间线和性能监控。</p>
+      </div>
+
+      <div class="feature-card tools">
+        <div class="feature-icon">🔧</div>
+        <h3 class="feature-title">专业诊断工具套件</h3>
+        <p class="feature-description">网络连接测试支持代理/直连模式，规则冲突自动检测和修复建议，规则匹配验证和批量测试。提供响应时间、状态码、重定向跟踪等详细分析。</p>
+      </div>
+
+      <div class="feature-card management">
+        <div class="feature-icon">⚙️</div>
+        <h3 class="feature-title">高级规则管理</h3>
+        <p class="feature-description">支持导入/导出规则文件，远程规则同步和定时更新，规则预览和验证功能。提供规则变更历史、冲突检测、版本控制等专业级管理特性。</p>
+      </div>
+
+      <div class="feature-card ui">
+        <div class="feature-icon">🎨</div>
+        <h3 class="feature-title">现代化用户界面</h3>
+        <p class="feature-description">直观操作面板支持一键切换代理模式，多标签设置中心分类管理各项功能。响应式设计适配不同屏幕，实时状态反馈即时反映代理使用状态。</p>
+      </div>
+    </div>
+
+    <!-- 信息卡片网格 -->
+    <div class="info-grid">
+      <div class="info-card">
+        <h3><span>🏗️</span>技术架构</h3>
+        <p>基于最新的Chrome Manifest V3标准构建，使用Service Worker后台处理代理逻辑，PAC脚本实现高效的代理自动配置。</p>
+        <p>采用模块化架构设计，包含弹出界面、设置中心、网络透视板、诊断工具等核心组件，确保代码清晰易维护。</p>
+        <div class="tech-list">
+          <span class="tech-tag">Manifest V3</span>
+          <span class="tech-tag">Service Worker</span>
+          <span class="tech-tag">PAC Script</span>
+          <span class="tech-tag">Chrome APIs</span>
+          <span class="tech-tag">响应式设计</span>
+        </div>
+      </div>
+
+      <div class="info-card author-card">
+        <h3><span>👨‍💻</span>开发团队</h3>
+        <p><strong>ReJeCtAll</strong> - 项目创始人和主要开发者</p>
+        <p><strong>开发初衷：</strong>厌倦了现有代理工具的复杂配置和性能问题，特别是在规则匹配时频繁触发DNS查询的设计。</p>
+        <p>ProxyGo专注于提供简洁高效的代理管理体验，通过智能规则引擎和可视化界面，让代理使用变得更加专业和便捷。</p>
+      </div>
+    </div>
+
+    <!-- 快速链接 -->
+    <div class="info-card">
+      <h3><span>🔗</span>快速链接</h3>
+      <div class="links-grid">
+        <a href="https://github.com/ReJeCtAll/ProxyGo" class="link-button" target="_blank">
+          <span>📦</span>
+          <span>GitHub 仓库</span>
+        </a>
+        <a href="https://github.com/ReJeCtAll/ProxyGo/issues" class="link-button secondary" target="_blank">
+          <span>🐛</span>
+          <span>问题反馈</span>
+        </a>
+        <a href="https://github.com/ReJeCtAll/ProxyGo/releases" class="link-button success" target="_blank">
+          <span>🚀</span>
+          <span>版本发布</span>
+        </a>
+        <a href="https://github.com/ReJeCtAll/ProxyGo/blob/main/README.md" class="link-button" target="_blank">
+          <span>📖</span>
+          <span>详细文档</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- 页脚 -->
+    <footer>
+      <p>ProxyGo v<span id="footerVersion">1.1</span> - 专业级Chrome代理管理工具</p>
+      <p>由 <a href="https://github.com/ReJeCtAll" target="_blank">ReJeCtAll</a> 用 ❤️ 开发</p>
+    </footer>
+  </div>
+
+  <script src="about.js"></script>
+</body>
+</html> 

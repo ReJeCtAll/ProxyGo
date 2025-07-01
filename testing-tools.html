@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>测试工具 - ProxyGo</title>
+  <link rel="stylesheet" href="common.css">
+  <style>
+    :root {
+      --primary: #6366f1;
+      --primary-hover: #5b5bd6;
+      --primary-light: #f0f1ff;
+      --success: #10b981;
+      --success-light: #ecfdf5;
+      --danger: #ef4444;
+      --danger-light: #fee2e2;
+      --warning: #f59e0b;
+      --warning-light: #fef3c7;
+      --info: #3b82f6;
+      --info-light: #dbeafe;
+      --bg: #fefefe;
+      --card-bg: #ffffff;
+      --text: #1f2937;
+      --text-secondary: #6b7280;
+      --text-muted: #9ca3af;
+      --border: #e5e7eb;
+      --border-light: #f3f4f6;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --radius-sm: 6px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #fefefe 0%, #f8fafc 100%);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 24px;
+    }
+
+
+
+
+
+    .card {
+      background: linear-gradient(135deg, var(--card-bg) 0%, #ffffff 100%);
+      border-radius: var(--radius-xl);
+      padding: 32px;
+      box-shadow: var(--shadow-lg);
+      margin-bottom: 32px;
+      border: 1px solid var(--border-light);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary) 0%, var(--primary-hover) 100%);
+    }
+
+    .card-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin: 0 0 24px 0;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-title:before {
+      content: '';
+      width: 4px;
+      height: 20px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+      border-radius: 2px;
+    }
+
+    .form-group {
+      margin-bottom: 24px;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 12px;
+      font-weight: 600;
+      font-size: 15px;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .help-text {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 8px;
+      line-height: 1.5;
+      background-color: var(--primary-light);
+      padding: 12px 16px;
+      border-radius: var(--radius-md);
+      border-left: 3px solid var(--primary);
+    }
+
+    .input-group {
+      display: flex;
+      align-items: stretch;
+      gap: 12px;
+    }
+
+    .input-group input {
+      flex: 1;
+    }
+
+    .input-group .button {
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 14px 16px;
+      border: 2px solid var(--border-light);
+      border-radius: var(--radius-md);
+      font-family: inherit;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      background: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%);
+      color: var(--text);
+    }
+
+    input[type="text"]:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+      background: #ffffff;
+      transform: translateY(-1px);
+    }
+
+    input[type="text"]:hover {
+      border-color: var(--border);
+    }
+
+
+
+
+
+    /* 网络诊断工具样式 */
+    .diagnostic-option {
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .diagnostic-option label {
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .diagnostic-option input[type="checkbox"] {
+      cursor: pointer;
+    }
+
+    .test-status {
+      margin-top: 16px;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      padding: 24px;
+      background-color: var(--primary-light);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      text-align: center;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 3px solid rgba(99, 102, 241, 0.2);
+      border-top-color: var(--primary);
+      animation: spin 1s infinite linear;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .result-card {
+      margin-bottom: 16px;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .result-card.success {
+      border-left: 4px solid var(--success);
+    }
+
+    .result-card.error {
+      border-left: 4px solid var(--danger);
+    }
+
+    .result-title {
+      padding: 12px 16px;
+      font-weight: 600;
+      background-color: rgba(99, 102, 241, 0.1);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .result-title.success {
+      background-color: rgba(16, 185, 129, 0.1);
+    }
+
+    .result-title.error {
+      background-color: rgba(239, 68, 68, 0.1);
+    }
+
+    .result-details {
+      padding: 12px 16px;
+    }
+
+    .copy-button {
+      background-color: transparent;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 4px 8px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .copy-button:hover {
+      background-color: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    .history-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border-light);
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .history-item:hover {
+      background-color: var(--primary-light);
+    }
+
+    .history-url {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      padding-right: 16px;
+    }
+
+    .history-status {
+      font-size: 12px;
+      padding: 2px 8px;
+      border-radius: 12px;
+      white-space: nowrap;
+    }
+
+    .history-status.success {
+      background-color: var(--success-light);
+      color: var(--success);
+    }
+
+    .history-status.error {
+      background-color: var(--danger-light);
+      color: var(--danger);
+    }
+
+    .history-time {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-left: 16px;
+      white-space: nowrap;
+    }
+
+    .empty-history {
+      color: var(--text-muted);
+      font-style: italic;
+      text-align: center;
+      padding: 24px;
+    }
+
+    /* Logo样式 */
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .logo {
+      width: 64px;
+      height: 64px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 32px;
+      box-shadow: var(--shadow-md);
+    }
+
+    .logo-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .logo-title {
+      font-size: 32px;
+      font-weight: 700;
+      margin: 0;
+      background: linear-gradient(135deg, var(--text) 0%, var(--text-secondary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .logo-subtitle {
+      font-size: 16px;
+      color: var(--text-muted);
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Logo容器 -->
+          <div class="logo-container">
+        <div class="logo logo-svg page-logo">
+          <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+            <g transform="translate(0,32) scale(0.1,-0.1)">
+              <path d="M102 303 c-47 -23 -78 -59 -90 -103 -25 -99 45 -191 146 -193 115 -2 189 118 138 224 -32 67 -129 103 -194 72z m66 -105 c3 -15 -4 -18 -37 -18 -34 0 -41 -3 -41 -20 0 -11 5 -20 10 -20 6 0 10 7 10 15 0 10 10 15 31 15 28 0 30 -2 27 -32 -3 -30 -6 -33 -41 -36 -52 -4 -87 19 -87 58 0 39 33 62 85 58 29 -2 41 -8 43 -20z m93 -18 c21 -12 25 -50 7 -68 -17 -17 -54 -15 -72 4 -21 20 -20 30 4 54 23 23 33 24 61 10z"/>
+              <path d="M220 140 c0 -5 5 -10 10 -10 6 0 10 5 10 10 0 6 -4 10 -10 10 -5 0 -10 -4 -10 -10z"/>
+            </g>
+          </svg>
+        </div>
+        <div class="logo-text">
+        <h1 class="logo-title">ProxyGo</h1>
+        <p class="logo-subtitle">简单高效的代理管理工具</p>
+      </div>
+    </div>
+    
+    <header>
+      <h1>测试工具</h1>
+      <a href="settings.html" class="back-link">返回菜单</a>
+    </header>
+    
+    <div class="card">
+      <!-- 网络诊断 -->
+      <div id="network-diagnostics-content">
+        <div class="form-group">
+          <label class="form-label" for="testUrl">输入要测试的 URL</label>
+          <div class="input-group">
+            <input type="text" id="testUrl" placeholder="例如: https://example.com">
+            <button id="testButton" class="btn primary">开始测试</button>
+          </div>
+          <div class="help-text">
+            输入完整的URL（包括https://或http://）进行网络连接测试。
+          </div>
+        </div>
+        
+        <div class="diagnostic-options">
+          <div class="diagnostic-option">
+            <input type="checkbox" id="useProxy" checked>
+            <label for="useProxy">使用代理（如果可用）</label>
+          </div>
+          <div class="diagnostic-option">
+            <input type="checkbox" id="showHeaders">
+            <label for="showHeaders">显示响应头信息</label>
+          </div>
+          <div class="diagnostic-option">
+            <input type="checkbox" id="showTiming">
+            <label for="showTiming">显示时间统计</label>
+          </div>
+        </div>
+        
+        <div id="testStatus" class="test-status">
+          <div class="spinner"></div>
+          <div>正在测试连接，请稍候...</div>
+        </div>
+        
+        <div id="testResults" class="test-results" style="display: none;">
+          <h3>测试结果</h3>
+          <div id="resultCards"></div>
+        </div>
+        
+        <div class="card" style="margin-top: 24px;">
+          <h3>测试历史</h3>
+          <div id="testHistory">
+            <div class="empty-history">暂无测试历史</div>
+          </div>
+          <button id="clearHistoryButton" class="btn secondary" style="margin-top: 16px;">清除历史记录</button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="card">
+      <div class="card-title">帮助说明</div>
+      <p><strong>网络诊断</strong> - 测试与指定URL的连接情况，包括响应时间、状态码等信息。可以选择是否使用代理、显示响应头和时间统计。</p>
+    </div>
+    
+    <footer style="text-align: center; margin-top: 32px; color: var(--text-muted);">
+      <p>ProxyGo &copy; 2025</p>
+    </footer>
+  </div>
+  
+  <script src="testing-tools.js"></script>
+  </body>
+</html> 

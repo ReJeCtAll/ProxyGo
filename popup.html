@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>ProxyGo</title>
+  <link rel="stylesheet" href="common.css">
+  <style>
+    /* Popup specific styles */
+    body {
+      width: 360px;
+      padding: 0;
+      margin: 0;
+      min-height: auto;
+    }
+
+    .popup-container {
+      padding: 20px;
+    }
+
+    .popup-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 24px;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .popup-header .logo {
+      margin-right: 12px;
+    }
+
+    .popup-header .title {
+      font-size: 20px;
+      font-weight: 700;
+      margin: 0;
+      background: linear-gradient(135deg, var(--text) 0%, var(--text-secondary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .popup-card {
+      background: linear-gradient(135deg, var(--card-bg) 0%, #ffffff 100%);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      box-shadow: var(--shadow-lg);
+      margin-bottom: 16px;
+      border: 1px solid var(--border-light);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .popup-card:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary) 0%, var(--primary-hover) 100%);
+    }
+
+    .proxy-status {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px;
+      background: linear-gradient(135deg, var(--success-light) 0%, #ffffff 100%);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-light);
+      margin-bottom: 0;
+    }
+
+    .status-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .status-label {
+      font-weight: 600;
+      font-size: 15px;
+      color: var(--text);
+    }
+
+    .proxy-url {
+      font-size: 13px;
+      color: var(--text-secondary);
+      font-family: ui-monospace, SFMono-Regular, 'SF Mono', Consolas, monospace;
+      background-color: rgba(255, 255, 255, 0.8);
+      padding: 4px 8px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-light);
+      word-break: break-all;
+    }
+
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 52px;
+      height: 28px;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, #d1d5db, #e5e7eb);
+      transition: all 0.3s ease;
+      border-radius: 28px;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 22px;
+      width: 22px;
+      left: 3px;
+      bottom: 3px;
+      background: linear-gradient(135deg, #ffffff, #f8fafc);
+      transition: all 0.3s ease;
+      border-radius: 50%;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+    }
+
+    input:checked + .slider {
+      background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(24px);
+    }
+
+    .slider:hover {
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1), 0 0 0 4px rgba(99, 102, 241, 0.1);
+    }
+
+    .mode-selector {
+      display: flex;
+      background: linear-gradient(135deg, var(--border-light) 0%, #ffffff 100%);
+      border-radius: var(--radius-md);
+      padding: 4px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border-light);
+    }
+
+    .mode-option {
+      flex: 1;
+      text-align: center;
+      padding: 12px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border-radius: var(--radius-sm);
+      color: var(--text-secondary);
+      position: relative;
+    }
+
+    .mode-option:hover {
+      color: var(--text);
+      background-color: rgba(99, 102, 241, 0.05);
+    }
+
+    .mode-option.active {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+      color: white;
+      box-shadow: var(--shadow-sm);
+      transform: translateY(-1px);
+    }
+
+    .popup-button {
+      display: block;
+      width: 100%;
+      padding: 14px 20px;
+      text-align: center;
+      border-radius: var(--radius-md);
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+
+    .popup-button:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .popup-button:hover:before {
+      left: 100%;
+    }
+
+    .popup-button.primary {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+      color: white;
+      box-shadow: var(--shadow-md);
+    }
+
+    .popup-button.primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px -4px rgba(99, 102, 241, 0.3);
+    }
+
+    .popup-button.primary:active {
+      transform: translateY(0);
+    }
+
+    .popup-button.secondary {
+      background: linear-gradient(135deg, #ffffff 0%, var(--bg) 100%);
+      color: var(--text);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .popup-button.secondary:hover {
+      background: linear-gradient(135deg, var(--bg) 0%, #f1f5f9 100%);
+      border-color: var(--primary);
+      color: var(--primary);
+      transform: translateY(-1px);
+    }
+
+    .help-text {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 8px;
+      margin-bottom: 12px;
+      line-height: 1.4;
+      background-color: var(--primary-light);
+      padding: 12px;
+      border-radius: var(--radius-md);
+      border-left: 3px solid var(--primary);
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="popup-container">
+    <div class="popup-header">
+      <div class="logo logo-svg popup-logo">
+        <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+          <g transform="translate(0,32) scale(0.1,-0.1)">
+            <path d="M102 303 c-47 -23 -78 -59 -90 -103 -25 -99 45 -191 146 -193 115 -2 189 118 138 224 -32 67 -129 103 -194 72z m66 -105 c3 -15 -4 -18 -37 -18 -34 0 -41 -3 -41 -20 0 -11 5 -20 10 -20 6 0 10 7 10 15 0 10 10 15 31 15 28 0 30 -2 27 -32 -3 -30 -6 -33 -41 -36 -52 -4 -87 19 -87 58 0 39 33 62 85 58 29 -2 41 -8 43 -20z m93 -18 c21 -12 25 -50 7 -68 -17 -17 -54 -15 -72 4 -21 20 -20 30 4 54 23 23 33 24 61 10z"/>
+            <path d="M220 140 c0 -5 5 -10 10 -10 6 0 10 5 10 10 0 6 -4 10 -10 10 -5 0 -10 -4 -10 -10z"/>
+          </g>
+        </svg>
+      </div>
+      <h1 class="title">ProxyGo</h1>
+    </div>
+
+    <div class="popup-card">
+      <div class="proxy-status">
+        <div class="status-info">
+          <span class="status-label">启用代理</span>
+          <div class="proxy-url" id="proxyUrlDisplay">http://localhost:7890</div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="proxyEnabled">
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="mode-selector">
+      <div class="mode-option active" data-mode="whitelist" title="白名单中的域名直连，其他一律走代理">白名单模式</div>
+      <div class="mode-option" data-mode="blacklist" title="黑名单中的域名走代理，其他一律直连">黑名单模式</div>
+    </div>
+    
+    <div class="help-text">
+      <strong>白名单模式</strong>：白名单中的域名直连，其他一律走代理<br>
+      <strong>黑名单模式</strong>：黑名单中的域名走代理，其他一律直连
+    </div>
+    
+    <button class="popup-button primary" id="openSettings">详细设置</button>
+    <button class="popup-button secondary hidden" id="showRules">查看当前规则</button>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
