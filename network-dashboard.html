@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>网络透视板 - ProxyGo</title>
+  <link rel="stylesheet" href="common.css">
+  <style>
+    .dashboard-controls {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+
+    .refresh-btn, .clear-btn {
+      padding: 10px 16px;
+      border: none;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .refresh-btn {
+      background: linear-gradient(135deg, var(--info) 0%, #2563eb 100%);
+      color: white;
+    }
+
+    .refresh-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .clear-btn {
+      background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%);
+      color: white;
+    }
+
+    .clear-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      margin-bottom: 32px;
+      max-width: 1200px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .dashboard-card {
+      background: linear-gradient(135deg, var(--card-bg) 0%, #ffffff 100%);
+      border-radius: var(--radius-xl);
+      padding: 32px;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border-light);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .dashboard-card:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary) 0%, var(--primary-hover) 100%);
+    }
+
+    .card-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin: 0 0 24px 0;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-title:before {
+      content: '';
+      width: 4px;
+      height: 20px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+      border-radius: 2px;
+    }
+
+    .top-domains-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .domain-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border-light);
+      transition: all 0.3s ease;
+    }
+
+    .domain-item:last-child {
+      border-bottom: none;
+    }
+
+    .domain-item:hover {
+      background-color: rgba(99, 102, 241, 0.05);
+      border-radius: var(--radius-md);
+      margin: 0 -8px;
+      padding: 16px 8px;
+    }
+
+    .domain-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .domain-name {
+      font-weight: 600;
+      color: var(--text);
+      font-size: 14px;
+    }
+
+    .domain-count {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .count-badge {
+      background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+      color: white;
+      padding: 4px 8px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .progress-bar {
+      width: 100px;
+      height: 6px;
+      background-color: var(--border-light);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary) 0%, var(--primary-hover) 100%);
+      border-radius: 3px;
+      transition: width 0.3s ease;
+    }
+
+    .recent-requests-list {
+      max-height: 500px;
+      overflow-y: auto;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .request-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px;
+      margin-bottom: 12px;
+      background: linear-gradient(135deg, var(--border-light) 0%, #ffffff 100%);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-light);
+      transition: all 0.3s ease;
+    }
+
+    .request-item:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .request-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      flex: 1;
+    }
+
+    .request-domain {
+      font-weight: 600;
+      color: var(--text);
+      font-size: 14px;
+    }
+
+    .request-meta {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .request-time {
+      font-family: ui-monospace, SFMono-Regular, 'SF Mono', Consolas, monospace;
+    }
+
+    .request-ip {
+      font-family: ui-monospace, SFMono-Regular, 'SF Mono', Consolas, monospace;
+      background-color: rgba(255, 255, 255, 0.8);
+      padding: 2px 6px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-light);
+    }
+
+    .proxy-status {
+      padding: 4px 8px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .proxy-status.proxy {
+      background: linear-gradient(135deg, var(--primary-light) 0%, #ffffff 100%);
+      color: var(--primary);
+      border: 1px solid var(--primary);
+    }
+
+    .proxy-status.direct {
+      background: linear-gradient(135deg, var(--success-light) 0%, #ffffff 100%);
+      color: var(--success);
+      border: 1px solid var(--success);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 48px 24px;
+      color: var(--text-muted);
+    }
+
+    .empty-state svg {
+      width: 64px;
+      height: 64px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+         /* Logo样式 */
+     .logo-container {
+       display: flex;
+       align-items: center;
+       gap: 16px;
+       margin-bottom: 32px;
+     }
+
+     .logo {
+       width: 64px;
+       height: 64px;
+       background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+       border-radius: var(--radius-lg);
+       display: flex;
+       align-items: center;
+       justify-content: center;
+       color: white;
+       font-weight: 700;
+       font-size: 32px;
+       box-shadow: var(--shadow-md);
+     }
+
+     .logo-text {
+       display: flex;
+       flex-direction: column;
+     }
+
+     .logo-title {
+       font-size: 32px;
+       font-weight: 700;
+       margin: 0;
+       background: linear-gradient(135deg, var(--text) 0%, var(--text-secondary) 100%);
+       -webkit-background-clip: text;
+       -webkit-text-fill-color: transparent;
+       background-clip: text;
+     }
+
+     .logo-subtitle {
+       font-size: 16px;
+       color: var(--text-muted);
+       margin: 0;
+     }
+
+     @media (max-width: 768px) {
+       .dashboard-grid {
+         grid-template-columns: 1fr;
+       }
+
+       .dashboard-card {
+         padding: 24px;
+       }
+
+       .request-item {
+         flex-direction: column;
+         align-items: flex-start;
+         gap: 8px;
+       }
+
+       .request-meta {
+         gap: 8px;
+         flex-wrap: wrap;
+       }
+       
+       .dashboard-controls {
+         flex-direction: column;
+         align-items: center;
+       }
+       
+       .dashboard-controls button {
+         width: 200px;
+       }
+     }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo-container">
+      <div class="logo logo-svg page-logo">
+        <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+          <g transform="translate(0,32) scale(0.1,-0.1)">
+            <path d="M102 303 c-47 -23 -78 -59 -90 -103 -25 -99 45 -191 146 -193 115 -2 189 118 138 224 -32 67 -129 103 -194 72z m66 -105 c3 -15 -4 -18 -37 -18 -34 0 -41 -3 -41 -20 0 -11 5 -20 10 -20 6 0 10 7 10 15 0 10 10 15 31 15 28 0 30 -2 27 -32 -3 -30 -6 -33 -41 -36 -52 -4 -87 19 -87 58 0 39 33 62 85 58 29 -2 41 -8 43 -20z m93 -18 c21 -12 25 -50 7 -68 -17 -17 -54 -15 -72 4 -21 20 -20 30 4 54 23 23 33 24 61 10z"/>
+            <path d="M220 140 c0 -5 5 -10 10 -10 6 0 10 5 10 10 0 6 -4 10 -10 10 -5 0 -10 -4 -10 -10z"/>
+          </g>
+        </svg>
+      </div>
+      <div class="logo-text">
+        <h1 class="logo-title">ProxyGo</h1>
+        <p class="logo-subtitle">简单高效的代理管理工具</p>
+      </div>
+    </div>
+    
+    <header>
+      <h1>网络透视板</h1>
+      <a href="settings.html" class="back-link">返回菜单</a>
+    </header>
+    
+    <main>
+      <div class="dashboard-controls">
+        <button class="refresh-btn" id="refreshBtn">
+          <span>🔄</span> 刷新数据
+        </button>
+        <button class="clear-btn" id="clearBtn">
+          <span>🗑️</span> 清除数据
+        </button>
+      </div>
+
+    <div class="dashboard-grid">
+      <!-- TOP10域名访问量 -->
+      <div class="dashboard-card">
+        <h2 class="card-title">目的地址请求量 TOP10</h2>
+        <ul class="top-domains-list" id="topDomainsList">
+          <!-- 动态生成 -->
+        </ul>
+      </div>
+
+      <!-- 最新域名请求记录 -->
+      <div class="dashboard-card">
+        <h2 class="card-title">最新域名请求记录</h2>
+        <ul class="recent-requests-list" id="recentRequestsList">
+          <!-- 动态生成 -->
+        </ul>
+      </div>
+    </div>
+
+    <!-- 调试面板 -->
+    <div class="dashboard-card" id="debugPanel" style="margin-top: 32px; display: none;">
+      <h2 class="card-title">🔍 调试信息</h2>
+      <div class="debug-content">
+        <div class="debug-section">
+          <h3 style="margin: 0 0 12px 0; font-size: 16px; color: var(--text);">存储数据状态</h3>
+          <pre id="storageData" style="background: var(--border-light); padding: 16px; border-radius: var(--radius-md); font-size: 12px; overflow-x: auto; white-space: pre-wrap;"></pre>
+        </div>
+        <div class="debug-section" style="margin-top: 20px;">
+          <h3 style="margin: 0 0 12px 0; font-size: 16px; color: var(--text);">数据收集状态</h3>
+          <div id="collectionStatus" style="background: var(--border-light); padding: 16px; border-radius: var(--radius-md); font-size: 14px;"></div>
+        </div>
+        <div class="debug-section" style="margin-top: 20px;">
+          <h3 style="margin: 0 0 12px 0; font-size: 16px; color: var(--text);">操作日志</h3>
+          <div id="debugLogs" style="background: var(--border-light); padding: 16px; border-radius: var(--radius-md); font-size: 12px; max-height: 200px; overflow-y: auto; font-family: monospace;"></div>
+        </div>
+        <div style="margin-top: 16px; text-align: center;">
+          <button id="toggleDebug" class="refresh-btn" style="margin-right: 8px;">隐藏调试</button>
+          <button id="clearLogs" class="clear-btn">清除日志</button>
+        </div>
+      </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 24px;">
+      <button id="debugToggleBtn" class="refresh-btn" style="margin-right: 16px;">显示调试信息</button>
+    </div>
+    </main>
+    
+    <footer>
+      <p>ProxyGo - 简单高效的代理管理工具</p>
+    </footer>
+  </div>
+
+  <script src="network-dashboard.js"></script>
+</body>
+</html> 
