@@ -44,12 +44,7 @@ ProxyGo 是一款功能强大的Chrome浏览器扩展，专为需要精细化代
 
 ### 安装方式
 
-#### 方式一：Chrome Web Store（推荐）
-1. 访问 [Chrome Web Store 中的 ProxyGo](https://chrome.google.com/webstore)
-2. 点击"添加至Chrome"按钮
-3. 确认权限后完成安装
-
-#### 方式二：开发者模式加载
+#### 方式一：开发者模式加载
 1. 下载项目源码：点击右上角 `Code` → `Download ZIP`
 2. 解压到本地目录
 3. 打开Chrome浏览器，进入 `chrome://extensions/`
@@ -157,7 +152,7 @@ ProxyGo 是一款功能强大的Chrome浏览器扩展，专为需要精细化代
 **国内直连白名单**（推荐用于海外代理）：
 
 ```
-https://github.com/ReJeCtAll/ProxyGo/blob/main/whitelist/whitelist.hostrules
+https://raw.githubusercontent.com/ReJeCtAll/ProxyGo/refs/heads/main/whitelist/whitelist.hostrules
 ```
 
 **常用CDN直连规则**：
