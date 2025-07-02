@@ -149,10 +149,16 @@ ProxyGo 是一款功能强大的Chrome浏览器扩展，专为需要精细化代
 
 ### 推荐规则列表
 
-**国内直连白名单**（推荐用于海外代理）：
+**国内直连白名单**
 
 ```
 https://raw.githubusercontent.com/ReJeCtAll/ProxyGo/refs/heads/main/whitelist/whitelist.hostrules
+```
+
+**代理黑名单规则库**
+
+```
+https://github.3x25.com/https://raw.githubusercontent.com/gfwlist/gfwlist/master/list.txt
 ```
 
 **常用CDN直连规则**：
