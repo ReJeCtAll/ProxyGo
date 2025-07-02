@@ -46,7 +46,7 @@
     .dashboard-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 32px;
+      gap: 16px;
       margin-bottom: 32px;
       max-width: 1200px;
       margin-left: auto;
@@ -61,6 +61,9 @@
       border: 1px solid var(--border-light);
       position: relative;
       overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
     }
 
     .dashboard-card:before {
@@ -95,15 +98,21 @@
       list-style: none;
       padding: 0;
       margin: 0;
+      flex-grow: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      width: 100%;
     }
 
     .domain-item {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 16px 0;
+      padding: 12px 0;
       border-bottom: 1px solid var(--border-light);
       transition: all 0.3s ease;
+      white-space: nowrap;
+      overflow: hidden;
     }
 
     .domain-item:last-child {
@@ -114,25 +123,35 @@
       background-color: rgba(99, 102, 241, 0.05);
       border-radius: var(--radius-md);
       margin: 0 -8px;
-      padding: 16px 8px;
+      padding: 12px 8px;
     }
 
     .domain-info {
       display: flex;
       flex-direction: column;
       gap: 4px;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
     }
 
     .domain-name {
       font-weight: 600;
       color: var(--text);
       font-size: 14px;
+      max-width: 180px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .domain-count {
       display: flex;
       align-items: center;
       gap: 8px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .count-badge {
@@ -145,11 +164,12 @@
     }
 
     .progress-bar {
-      width: 100px;
+      width: 80px;
       height: 6px;
       background-color: var(--border-light);
       border-radius: 3px;
       overflow: hidden;
+      flex-shrink: 0;
     }
 
     .progress-fill {
@@ -160,19 +180,19 @@
     }
 
     .recent-requests-list {
-      max-height: 500px;
       overflow-y: auto;
       margin: 0;
       padding: 0;
       list-style: none;
+      flex-grow: 1;
     }
 
     .request-item {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 16px;
-      margin-bottom: 12px;
+      padding: 12px;
+      margin-bottom: 8px;
       background: linear-gradient(135deg, var(--border-light) 0%, #ffffff 100%);
       border-radius: var(--radius-md);
       border: 1px solid var(--border-light);
@@ -238,8 +258,14 @@
 
     .empty-state {
       text-align: center;
-      padding: 48px 24px;
+      padding: 24px 24px;
       color: var(--text-muted);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      min-height: 200px; /* 确保空状态时有足够的高度 */
     }
 
     .empty-state svg {
@@ -249,78 +275,129 @@
       opacity: 0.5;
     }
 
-         /* Logo样式 */
-     .logo-container {
-       display: flex;
-       align-items: center;
-       gap: 16px;
-       margin-bottom: 32px;
-     }
+    /* Logo样式 */
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 32px;
+    }
 
-     .logo {
-       width: 64px;
-       height: 64px;
-       background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
-       border-radius: var(--radius-lg);
-       display: flex;
-       align-items: center;
-       justify-content: center;
-       color: white;
-       font-weight: 700;
-       font-size: 32px;
-       box-shadow: var(--shadow-md);
-     }
+    .logo {
+      width: 64px;
+      height: 64px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 32px;
+      box-shadow: var(--shadow-md);
+    }
 
-     .logo-text {
-       display: flex;
-       flex-direction: column;
-     }
+    .logo-text {
+      display: flex;
+      flex-direction: column;
+    }
 
-     .logo-title {
-       font-size: 32px;
-       font-weight: 700;
-       margin: 0;
-       background: linear-gradient(135deg, var(--text) 0%, var(--text-secondary) 100%);
-       -webkit-background-clip: text;
-       -webkit-text-fill-color: transparent;
-       background-clip: text;
-     }
+    .logo-title {
+      font-size: 32px;
+      font-weight: 700;
+      margin: 0;
+      background: linear-gradient(135deg, var(--text) 0%, var(--text-secondary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
 
-     .logo-subtitle {
-       font-size: 16px;
-       color: var(--text-muted);
-       margin: 0;
-     }
+    .logo-subtitle {
+      font-size: 16px;
+      color: var(--text-muted);
+      margin: 0;
+    }
 
-     @media (max-width: 768px) {
-       .dashboard-grid {
-         grid-template-columns: 1fr;
-       }
+    /* 分页控件样式 */
+    .pagination-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 8px;
+      margin-bottom: 8px;
+      gap: 12px;
+      margin-top: auto;
+      padding-top: 8px;
+      position: relative;
+      z-index: 1;
+    }
 
-       .dashboard-card {
-         padding: 24px;
-       }
+    .pagination-btn {
+      background: linear-gradient(135deg, var(--primary-light) 0%, #ffffff 100%);
+      border: 1px solid var(--primary);
+      color: var(--primary);
+      padding: 6px 12px;
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
 
-       .request-item {
-         flex-direction: column;
-         align-items: flex-start;
-         gap: 8px;
-       }
+    .pagination-btn:hover:not([disabled]) {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+      color: white;
+    }
 
-       .request-meta {
-         gap: 8px;
-         flex-wrap: wrap;
-       }
-       
-       .dashboard-controls {
-         flex-direction: column;
-         align-items: center;
-       }
-       
-       .dashboard-controls button {
-         width: 200px;
-       }
-     }
+    .pagination-btn[disabled] {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .pagination-info {
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .current-page, .total-pages {
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    @media (max-width: 768px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .dashboard-card {
+        padding: 24px;
+      }
+
+      .request-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+
+      .request-meta {
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      
+      .dashboard-controls {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      .dashboard-controls button {
+        width: 200px;
+      }
+      
+      .pagination-controls {
+        flex-wrap: wrap;
+        margin-bottom: 32px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -382,34 +459,11 @@
       </div>
     </div>
 
-    <!-- 调试面板 -->
-    <div class="dashboard-card" id="debugPanel" style="margin-top: 32px; display: none;">
-      <h2 class="card-title">🔍 调试信息</h2>
-      <div class="debug-content">
-        <div class="debug-section">
-          <h3 style="margin: 0 0 12px 0; font-size: 16px; color: var(--text);">存储数据状态</h3>
-          <pre id="storageData" style="background: var(--border-light); padding: 16px; border-radius: var(--radius-md); font-size: 12px; overflow-x: auto; white-space: pre-wrap;"></pre>
-        </div>
-        <div class="debug-section" style="margin-top: 20px;">
-          <h3 style="margin: 0 0 12px 0; font-size: 16px; color: var(--text);">数据收集状态</h3>
-          <div id="collectionStatus" style="background: var(--border-light); padding: 16px; border-radius: var(--radius-md); font-size: 14px;"></div>
-        </div>
-        <div class="debug-section" style="margin-top: 20px;">
-          <h3 style="margin: 0 0 12px 0; font-size: 16px; color: var(--text);">操作日志</h3>
-          <div id="debugLogs" style="background: var(--border-light); padding: 16px; border-radius: var(--radius-md); font-size: 12px; max-height: 200px; overflow-y: auto; font-family: monospace;"></div>
-        </div>
-        <div style="margin-top: 16px; text-align: center;">
-          <button id="toggleDebug" class="refresh-btn" style="margin-right: 8px;">隐藏调试</button>
-          <button id="clearLogs" class="clear-btn">清除日志</button>
-        </div>
-      </div>
-    </div>
 
-    <div style="text-align: center; margin-top: 24px;">
-      <button id="debugToggleBtn" class="refresh-btn" style="margin-right: 16px;">显示调试信息</button>
-    </div>
+
+
     </main>
-    
+    <br><br><br><br><br><br> 
     <footer>
       <p>ProxyGo - 简单高效的代理管理工具</p>
     </footer>
