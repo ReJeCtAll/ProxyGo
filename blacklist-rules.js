@@ -2,11 +2,15 @@
 document.addEventListener("DOMContentLoaded", () => {
   const blacklistRulesInput = document.getElementById("blacklistRules");
   const blacklistRulesUrlInput = document.getElementById("blacklistRulesUrl");
+  const blacklistCustomRulesInput = document.getElementById("blacklistCustomRules");
   const fetchBlacklistRulesButton = document.getElementById("fetchBlacklistRules");
   const previewBlacklistRulesButton = document.getElementById("previewBlacklistRules");
+  const previewCustomRulesButton = document.getElementById("previewCustomRules");
+  const clearCustomRulesButton = document.getElementById("clearCustomRules");
   const saveBlacklistButton = document.getElementById("saveBlacklist");
   const backToSettingsButton = document.getElementById("backToSettings");
   const blacklistUrlRulesCount = document.getElementById("blacklistUrlRulesCount");
+  const blacklistCustomRulesCount = document.getElementById("blacklistCustomRulesCount");
 
   // Modal elements
   const rulesPreviewModal = document.getElementById("rulesPreviewModal");
@@ -18,6 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Current preview state
   let currentPreviewRules = "";
+  let currentPreviewType = ""; // 'url' or 'custom'
 
   // Rule validation - 参考 fsp-ext 的验证逻辑
   function isValidPattern(pattern) {
@@ -67,8 +72,20 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // Update blacklist custom rules count badge
+  function updateBlacklistCustomRulesCount() {
+    chrome.storage.local.get(["blacklistCustomRulesParsed"], (data) => {
+      if (data.blacklistCustomRulesParsed && data.blacklistCustomRulesParsed.length > 0) {
+        blacklistCustomRulesCount.textContent = data.blacklistCustomRulesParsed.length;
+        blacklistCustomRulesCount.classList.remove("hidden");
+      } else {
+        blacklistCustomRulesCount.classList.add("hidden");
+      }
+    });
+  }
+
   // Open modal with rules preview
-  function openRulesPreview(title, rules) {
+  function openRulesPreview(title, rules, type) {
     previewModalTitle.textContent = title;
 
     // Count valid rules
@@ -81,6 +98,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Store current preview for "Apply" button
     currentPreviewRules = rules;
+    currentPreviewType = type;
 
     // Show modal
     rulesPreviewModal.style.display = "block";
@@ -102,15 +120,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Apply rules button click
   applyRulesButton.addEventListener("click", () => {
-    // Save to storage
-    chrome.storage.local.set({
-      blacklistUrlRules: currentPreviewRules,
-      blacklistUrlRulesParsed: parseRules(currentPreviewRules).rules
-    }, () => {
-      updateBlacklistUrlRulesCount();
-      rulesPreviewModal.style.display = "none";
-      alert("黑名单URL规则已应用，请记得保存设置");
-    });
+    // Save to storage based on type
+    if (currentPreviewType === 'url') {
+      chrome.storage.local.set({
+        blacklistUrlRules: currentPreviewRules,
+        blacklistUrlRulesParsed: parseRules(currentPreviewRules).rules
+      }, () => {
+        updateBlacklistUrlRulesCount();
+        rulesPreviewModal.style.display = "none";
+        alert("黑名单URL规则已应用，请记得保存设置");
+      });
+    } else if (currentPreviewType === 'custom') {
+      chrome.storage.local.set({
+        blacklistCustomRules: currentPreviewRules,
+        blacklistCustomRulesParsed: parseRules(currentPreviewRules).rules
+      }, () => {
+        updateBlacklistCustomRulesCount();
+        rulesPreviewModal.style.display = "none";
+        alert("自定义规则已应用，请记得保存设置");
+      });
+    }
   });
 
   // Fetch rules from URL
@@ -136,7 +165,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       // Open the preview modal with the fetched rules
-      openRulesPreview("黑名单URL规则预览", text);
+      openRulesPreview("黑名单URL规则预览", text, 'url');
 
       console.log(`Fetched rules from ${url}`);
     } catch (e) {
@@ -149,18 +178,46 @@ document.addEventListener("DOMContentLoaded", () => {
   function previewExistingRules() {
     chrome.storage.local.get(["blacklistUrlRules"], (data) => {
       if (data.blacklistUrlRules && data.blacklistUrlRules.trim()) {
-        openRulesPreview("黑名单URL规则预览", data.blacklistUrlRules);
+        openRulesPreview("黑名单URL规则预览", data.blacklistUrlRules, 'url');
       } else {
         alert("暂无URL规则，请先从URL加载规则");
       }
     });
   }
 
+  // Preview custom rules
+  function previewCustomRules() {
+    const customRules = blacklistCustomRulesInput.value;
+    if (customRules && customRules.trim()) {
+      openRulesPreview("自定义规则预览", customRules, 'custom');
+    } else {
+      chrome.storage.local.get(["blacklistCustomRules"], (data) => {
+        if (data.blacklistCustomRules && data.blacklistCustomRules.trim()) {
+          openRulesPreview("自定义规则预览", data.blacklistCustomRules, 'custom');
+        } else {
+          alert("暂无自定义规则，请先添加规则");
+        }
+      });
+    }
+  }
+
+  // Clear custom rules
+  function clearCustomRules() {
+    if (confirm("确定要清空所有自定义规则吗？")) {
+      blacklistCustomRulesInput.value = "";
+      chrome.storage.local.remove(["blacklistCustomRules", "blacklistCustomRulesParsed"], () => {
+        updateBlacklistCustomRulesCount();
+        alert("自定义规则已清空");
+      });
+    }
+  }
+
   // Load saved configuration
   chrome.storage.local.get([
     "blacklistRules",
     "blacklistRawRules",
-    "blacklistRulesUrl"
+    "blacklistRulesUrl",
+    "blacklistCustomRules"
   ], (data) => {
     console.log("Loading blacklist settings...");
 
@@ -178,8 +235,15 @@ document.addEventListener("DOMContentLoaded", () => {
       blacklistRulesUrlInput.value = data.blacklistRulesUrl;
     }
 
-    // Update URL rules count
+    // Set custom rules
+    if (data.blacklistCustomRules) {
+      blacklistCustomRulesInput.value = data.blacklistCustomRules;
+      console.log(`Loaded blacklist custom rules`);
+    }
+
+    // Update rules count badges
     updateBlacklistUrlRulesCount();
+    updateBlacklistCustomRulesCount();
   });
 
   // Fetch blacklist rules button
@@ -196,25 +260,43 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  // Preview custom rules button
+  previewCustomRulesButton.addEventListener("click", () => {
+    previewCustomRules();
+  });
+
+  // Clear custom rules button
+  clearCustomRulesButton.addEventListener("click", () => {
+    clearCustomRules();
+  });
+
   // Save blacklist settings
   saveBlacklistButton.addEventListener("click", () => {
     const blacklistRawRules = blacklistRulesInput.value;
     const blacklistRulesUrl = blacklistRulesUrlInput.value.trim();
+    const blacklistCustomRules = blacklistCustomRulesInput.value;
 
     const blacklistResult = parseRules(blacklistRawRules);
+    const blacklistCustomResult = parseRules(blacklistCustomRules);
 
     // Get URL rules
     chrome.storage.local.get(["blacklistUrlRulesParsed"], (data) => {
-      // Combine manual rules with URL rules
-      const combinedBlacklistRules = [
+      // Combine manual rules with URL rules and custom rules
+      // 使用Set去重
+      const uniqueRules = new Set([
         ...(blacklistResult.rules || []),
-        ...(data.blacklistUrlRulesParsed || [])
-      ];
+        ...(data.blacklistUrlRulesParsed || []),
+        ...(blacklistCustomResult.rules || [])
+      ]);
+      
+      const combinedBlacklistRules = Array.from(uniqueRules);
 
       // Prepare data to save
       const dataToSave = {
         blacklistRules: combinedBlacklistRules,
-        blacklistRawRules: blacklistRawRules
+        blacklistRawRules: blacklistRawRules,
+        blacklistCustomRules: blacklistCustomRules,
+        blacklistCustomRulesParsed: blacklistCustomResult.rules
       };
 
       // Save rules URL if valid
@@ -240,7 +322,12 @@ document.addEventListener("DOMContentLoaded", () => {
             });
           }
 
-          alert("黑名单设置已保存！");
+          // 显示成功提示
+          const successToast = document.getElementById("successToast");
+          successToast.classList.add("show");
+          setTimeout(() => {
+            successToast.classList.remove("show");
+          }, 3000);
         });
       });
     });
