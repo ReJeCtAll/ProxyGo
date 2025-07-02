@@ -814,6 +814,23 @@ example.com"></textarea>
           </div>
         </div>
 
+        <div class="form-group">
+          <label class="form-label" for="whitelistCustomRules">自定义规则 <span id="whitelistCustomRulesCount" class="badge hidden">0</span></label>
+          <div class="rule-container">
+            <div class="rules-editor-container">
+              <div id="customLineNumbers" class="line-numbers"></div>
+              <textarea id="whitelistCustomRules" spellcheck="false" placeholder="在此处添加自定义规则，每行一条规则，例如：
+.baidu.com
+*.qq.com
+example.com"></textarea>
+            </div>
+            <div class="rule-actions">
+              <button id="clearCustomRules" class="button danger-button">清空规则</button>
+              <button id="previewCustomRules" class="button secondary-button">预览规则</button>
+            </div>
+          </div>
+        </div>
+
         <div class="actions">
           <button class="button secondary-button" id="backToSettings">返回设置</button>
           <button class="button primary-button" id="saveWhitelist">保存设置</button>
